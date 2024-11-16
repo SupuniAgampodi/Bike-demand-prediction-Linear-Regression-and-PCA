@@ -21,15 +21,25 @@ https://archive.ics.uci.edu/dataset/560/seoul+bike+sharing+demand
 
 Model	
 BikeCount ~ Seasons	
+
 BikeCount ~ Hour	
+
 BikeCount _Count ~ Seasons + Hour	
+
 BikeCount ~ Seasons + Hour + DewPoint+ Humidity + Temp	
+
 BikeCount ~ DewPoint + Humidity + Temp
+
 BikeCount ~ Dew_Point + Humidity
+
 BikeCount ~ DewPoint + Temp	
+
 BikeCount ~ Humidity + Temp	
+
 BikeCount ~ DewPoint	
+
 BikeCount ~ Humidity	
+
 BikeCount ~ Temp	
 
 ![image](https://github.com/user-attachments/assets/a4ad36bc-487f-4779-9c04-98b7d076f70b)
