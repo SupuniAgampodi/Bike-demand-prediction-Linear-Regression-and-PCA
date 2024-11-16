@@ -1,0 +1,480 @@
+---
+  title: "ICT513_Project_AGAMPODI"
+author: "Supuni Agampodi"
+date: "2023-11-03"
+output: pdf_document
+---
+  
+  ```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+
+```{r }
+## clear the working directory
+rm(list = ls())
+library(devtools)
+devtools::install_github("vqv/ggbiplot")
+# Load the "dplyr" package.
+library(dplyr)
+# Load the "purrr" package.
+library(purrr)
+# Load the "ggplot2" package.
+library(ggplot2)
+# Load the "bootstrap" package.
+library(bootstrap)
+# Load the "leaps" package.
+library(leaps)
+library(plyr)
+library(scales)
+library(gridExtra)
+```
+
+# Introduction
+
+
+## Read Data
+```{r}
+# Set the working directory to the specified location
+setwd("D:/Supuni/Murdoch/Y2S2/ICT513-DA/Project")
+
+# Read the dataset 'SeoulBikeData.csv' into a variable called 'bike'
+bike <- read.csv("SeoulBikeData.csv", check.names = FALSE)
+
+# Rename columns for clarity
+bike <- setNames(bike, c("date", "bike_count", "hour", "temp", "humidity", "wind_speed", "visibility", "dew_point_temp", "solar_radiation", "rainfall", "snowfall", "seasons", "holiday", "functioning_day"))
+
+# Check the structure of the 'bike' dataset
+str(bike)
+
+# Summarize the total count of missing values in the 'bike' dataset
+sum(is.na(bike))
+
+# Display the dimensions (rows and columns) of the 'bike' dataset
+dim(bike)
+```
+
+## Trasform Data
+```{r}
+# Convert specific columns to categorical variables for analysis
+bike$hour <- factor(bike$hour)
+bike$seasons <- factor(bike$seasons)
+bike$holiday <- factor(bike$holiday)
+bike$functioning_day <- factor(bike$functioning_day)
+
+# Summarize the 'functioning_day' variable
+summary(bike$functioning_day)
+```
+
+
+
+
+## Visualizations
+### Bike Demand by Functioning Day
+```{r}
+# Create a box plot for Bike Demand by Functioning Day using ggplot2
+fig1 <- ggplot(bike, aes(x = as.factor(functioning_day), y = bike_count)) +
+  geom_boxplot(fill = "slateblue", alpha = 0.2) + # Customize boxplot appearance
+  ggtitle("Fig 1. Bike Demand by Functioning Day") +  # Set the plot title
+  xlab("Functioning Day") +  # Label for the x-axis
+  ylab("Bike Count")  # Label for the y-axis
+
+# Customize the plot title text appearance
+fig1 + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5))
+```
+```{r}
+# Deleting rows when it is non-functioning day
+bike<-bike[!(bike$functioning_day=="No"),]
+
+# removing unused columns
+bike <- subset(bike, select = - c(functioning_day))
+bike <- subset(bike, select = - c(date))
+
+summary(bike)
+```
+
+
+### Hourly Bike Count Plot
+```{r}
+# Create a box plot for Hourly Bike Count Plot using ggplot2
+fig2 <- ggplot(bike, aes(x = as.factor(hour), y = bike_count)) +
+  geom_boxplot(fill = "blue", alpha = 0.2) +  # Customize boxplot appearance
+  ggtitle("Fig 2. Hourly Bike Count Plot") +  # Set the plot title
+  xlab("Hour") +  # Label for the x-axis
+  ylab("Bike Count")  # Label for the y-axis
+
+# Customize the plot title text appearance
+fig2 + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5))
+
+```
+
+### Seasonal Bike Count Plot
+```{r}
+# Create a box plot for Seasonal Bike Count Plot using ggplot2
+fig3 <- ggplot(bike, aes(x = as.factor(seasons), y = bike_count)) +
+  geom_boxplot(fill = "blue", alpha = 0.2) +  # Customize boxplot appearance
+  ggtitle("Fig 3. Seasonal Bike Count Plot") +  # Set the plot title
+  xlab("Seasons") +  # Label for the x-axis
+  ylab("Bike Count")  # Label for the y-axis
+
+# Customize the plot title text appearance
+fig3 + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5))
+```
+
+### Holiday Bike Count Plot
+```{r}
+# Create a box plot for Holiday Bike Count Plot using ggplot2
+fig4 <- ggplot(bike, aes(x = as.factor(holiday), y = bike_count)) +
+  geom_boxplot(fill = "blue", alpha = 0.2) +  # Customize boxplot appearance
+  ggtitle("Fig 4. Holiday Bike Count Plot") +  # Set the plot title
+  xlab("Holiday") +  # Label for the x-axis
+  ylab("Bike Count")  # Label for the y-axis
+
+# Customize the plot title text appearance
+fig4 + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5))
+
+```
+
+### Histograms for numeric explanatory variables
+```{r}
+# Identify the numeric columns in the 'bike' data frame
+continuous <- bike %>%
+  select(where(is.numeric))
+
+# Create histogram plots for numeric columns
+histogram_plots <- lapply(names(continuous), function(column_name) {
+  ggplot(data = bike, aes(x = .data[[column_name]])) +
+    geom_histogram(fill = 'blue', color = 'black', bins = 30, alpha = 0.2) +
+    labs(title = paste("Distribution of", column_name))
+})
+
+# Print or display the histogram plots
+for (plot in histogram_plots) {
+  print(plot)
+}
+```
+
+
+### Histograms for numeric explanatory variables combined
+```{r}
+# Identify the numeric columns in the 'bike' data frame (excluding 'bike_count')
+continuous <- bike %>%
+  select(where(is.numeric)) %>%
+  select(-bike_count)
+
+# Create histogram plots for numeric columns
+histogram_plots <- lapply(names(continuous), function(column_name) {
+  ggplot(data = bike, aes(x = .data[[column_name]])) +
+    geom_histogram(fill = 'blue', color = 'black', bins = 30, alpha = 0.2) +
+    labs(title = paste("Distribution of", column_name))
+})
+
+# Arrange the plots in a 2x5 grid (2 rows and 5 columns)
+grid.arrange(
+  do.call(arrangeGrob, c(histogram_plots, ncol = 2)),
+  ncol = 2
+)
+```
+
+### Scatter Plot of Hour vs BikeCount for each Season
+```{r}
+ggplot(bike, aes(x = hour, y = bike_count, color = seasons)) +
+  geom_point(size = 3) +
+  labs(
+    title = "Bike Count by Hour",
+    x = "Hour",
+    y = "Bike Count"
+  )
+```
+
+
+# Method
+
+## Part A
+
+
+### Regression model with hour and seasons
+
+```{r}
+set.seed(32)
+# Fit a linear regression model
+bike.lm <- lm(bike_count ~ hour + seasons, data = bike)
+```
+
+### Assumptions
+Let us check the normality assumption by investigating a normal Q-Q plot of the residuals.And homoscedasticity assumption by investigating fitted values of regression vs the residuals plot.
+
+```{r}
+# Set the plotting layout to one row and two columns
+par(mfrow = c(1, 2))
+
+# Plot 1: Normal QQ plot of Residuals
+plot(bike.lm$fitted.values, bike.lm$residuals, main = "Normal QQ plot of Residuals")
+abline(h = 0)  # Add a horizontal line at y = 0
+
+# Plot 2: Residuals vs. Fitted Values
+qqnorm(bike.lm$residuals, main = "Residuals vs Fitted Values", xlab = "Fitted Values", ylab = "Residuals")
+qqline(bike.lm$residuals)  # Add a reference line to the QQ plot
+```
+
+
+
+### Log transformation of bike count
+```{r}
+# Fit a linear regression model with the log transformed bike_count
+bike.lm.log <- lm(log(bike_count) ~ hour + seasons, data = bike)
+```
+
+## Assumptions for Log transformation model
+Let us check the normality assumption by investigating a normal Q-Q plot of the residuals.And homoscedasticity assumption by investigating fitted values of regression vs the residuals plot.
+
+```{r}
+# Set the plotting layout to one row and two columns
+par(mfrow = c(1, 2))
+
+# Plot 1: Normal QQ plot of Residuals
+plot(bike.lm.log$fitted.values, bike.lm.log$residuals, main = "Normal QQ plot of Residuals")
+abline(h = 0)  # Add a horizontal line at y = 0
+
+# Plot 2: Residuals vs. Fitted Values
+qqnorm(bike.lm.log$residuals, main = "Residuals vs Fitted Values", xlab = "Fitted Values", ylab = "Residuals")
+qqline(bike.lm.log$residuals)  # Add a reference line to the QQ plot
+```
+
+
+
+### Review the Model
+```{r}
+summary(bike.lm)
+```
+
+
+# Regression model for all variables
+
+```{r}
+bike.lm.all <- lm(bike_count ~., 
+                  data = bike)
+```
+
+## Assumptions
+Let us check the normality assumption by investigating a normal Q-Q plot of the residuals.And homoscedasticity assumption by investigating fitted values of regression vs the residuals plot.
+```{r}
+## look at the diagnostics
+par(mfrow = c(1,2))
+plot(bike.lm.all$fitted.values, bike.lm.all$residuals, main = "Normal QQ plot of Residuals")
+abline(h=0)
+qqnorm(bike.lm.all$residuals,main = "SResiduals vs Fitted Values", xlab= "Fitted Values", ylab= "Residuals")
+qqline(bike.lm.all$residuals)
+```
+
+# Review the Model 3
+```{r}
+summary(bike.lm.all)
+```
+
+
+# Part B
+
+## Principal Component Analysis 
+
+### Covariance and Corelation
+```{r}
+# Identify the numeric columns in the 'bike' data frame
+bike.continuous <- bike %>%
+  select(temp, humidity, wind_speed, dew_point_temp, rainfall, snowfall, solar_radiation, visibility)
+
+# Calculate covariances between columns in the 'stocks.subset' dataset, excluding the first column
+bike.cov <- cov(bike.continuous)
+
+# Display the covariance matrix
+bike.cov
+
+# Calculate the correlations between columns in the 'stocks.subset' dataset, excluding the first column
+bike.cor <- cor(bike.continuous)
+
+# Display the correlation matrix
+bike.cor
+
+```
+
+### Perform Principal Component Analysis
+```{r}
+# Perform PCA on the 'stocks.subset' dataset
+# The 'scale = T' argument scales the variables before performing PCA
+colSums(is.na(bike.continuous))
+bike.pca <- prcomp(~., data = bike.continuous, scale = T)
+
+# Display the results of PCA
+bike.pca
+
+# Access the standard deviations of the principal components
+bike.pca$sdev
+
+# Access the rotation matrix, which contains the loadings of each variable on the principal components
+bike.pca$rotation
+```
+
+
+### Scree Plot
+```{r}
+# Create a scree plot for the principal components
+plot(bike.pca, type = 'l')
+
+# Create a scree plot for the percentage of total variance explained by each principal component
+plot(bike.pca$sdev^2/sum(bike.pca$sdev^2),
+     ylim = c(0,1),
+     xlab='Principal Component',
+     ylab = 'Percentage of total variance',
+     main = 'Scree Plot of Variance Accounted for each Principal Component',
+     xaxt = "n", type="b")
+axis(side=1, at=1:30)
+```
+
+
+### Calculate Percentage of Variance 
+```{r}
+# Calculate the percentage of variance explained by each principal component
+percentage_of_variance <- (bike.pca$sdev^2) / sum(bike.pca$sdev^2)
+percentage_of_variance
+
+# Calculate the cumulative variance explained by the principal components
+cumulative_var <- cumsum(bike.pca$sdev^2) / sum(bike.pca$sdev^2)
+cumulative_var
+
+# Create a plot of the cumulative variance explained by principal components
+# The x-axis represents the number of components, and the y-axis represents the cumulative variance explained
+plot(cumulative_var,  main = 'Cummulative Variance explained each Principal Component',
+     xlab = "Principal Components", ylab = "Cumulative Variance Explained", type = "b")
+
+```
+
+
+### Biplot
+```{r}
+# Create a biplot for the PCA results
+biplot(bike.pca)
+
+# Create a scatterplot using ggbiplot
+g = ggbiplot(bike.pca, obs.scale = 1, var.scale = 1, groups = bike.continuous$bike_count, ellipse = TRUE, circle = TRUE)
+
+# Customize the scatterplot
+g = g + scale_color_discrete(name = '')
+g = g + theme(legend.direction = 'horizontal', legend.position = 'top')
+
+# Print the scatterplot
+print(g)
+```
+
+
+### The percentage contributions of the variables on PC1 
+```{r}
+# Extract the loadings for the first principal component (PC1)
+loadings_PC1 <- bike.pca$rotation[, 1]
+
+# Calculate the sum of absolute loadings for all variables
+sum_all_loadings <- sum(abs(loadings_PC1))
+
+# Calculate the percentage contributions of all variables to PC1
+percentage_contributions <- round((abs(loadings_PC1) / sum_all_loadings) * 100, 2)
+
+# Display the percentage contributions
+percentage_contributions
+```
+
+
+
+
+### Cross Validation 
+We will generate 10 candidate models selecting from seasons, hour and the first 3 variables that have a highest percentage contribution on PC1 (humidity, dew_point_temp, temp)
+
+```{r}
+# Define the function that relates X (where X is a design matrix) to the response Y.
+model.fit <- function(x, y)
+{
+  return(lm(y ~ x - 1))
+}
+
+# Calculated the predicted/fitted values corresponding to this function.
+predicted.values <- function(model.fit, x)
+{
+  return(x %*% model.fit$coefficients)
+}
+
+# Define the function that calculates prediction error for a given observation.  We will use squared residuals.
+squared.residual <- function(Y, Y.hat)
+{
+  return((Y - Y.hat) ^ 2)
+}
+
+
+# 100 repetitions of cross-validation
+ncrossval <- 100
+
+# Construct a variable that includes the formulae corresponding to each of the candidate models.
+formulae <- c("bike_count ~ seasons",
+              "bike_count ~ hour",
+              "bike_count ~ seasons + hour",
+              "bike_count ~ seasons + hour + dew_point_temp + humidity + temp",
+              "bike_count ~ dew_point_temp + humidity + temp",
+              "bike_count ~ dew_point_temp + humidity",
+              "bike_count ~ dew_point_temp + temp",
+              "bike_count ~ humidity + temp",
+              "bike_count ~ dew_point_temp",
+              "bike_count ~ humidity",
+              "bike_count ~ temp")
+
+
+# Construct matrices for PRESS, MSE, and RMSE which have separate columns corresponding to the candidate models.  Each row stores values for a given repetition of cross-validation, so there are "ncrossval" rows.
+PRESS.mat <- matrix(NA, nrow = ncrossval, ncol = length(formulae))
+MSE.mat <- matrix(NA, nrow = ncrossval, ncol = length(formulae))
+RMSE.mat <- matrix(NA, nrow = ncrossval, ncol = length(formulae))
+
+# Re-set the random number generator seed.
+set.seed(1234)
+
+# Create an outer "for" loop that carries out "ncrossval" repetitions of cross-validation.
+for(i in 1 : ncrossval)
+{
+  # Create an inner "for" loop that carries out cross-validation for each of the candidate models.
+  for(j in 1 : length(formulae))
+  {
+    # Carry out ten-fold cross-validation for the given candidate model
+    bike.cv <- crossval(model.matrix(as.formula(formulae[j]), data = bike), 
+                        bike$bike_count, 
+                        theta.fit = model.fit, 
+                        theta.predict = predicted.values, 
+                        ngroup = 10)  
+    
+    # Calculate PRESS, MSE, and RMSE for this candidate model and save to the appropriate cell in the matrix.
+    PRESS.mat[i, j] <- sum((bike$bike_count - bike.cv$cv.fit) ^ 2)
+    MSE.mat[i, j] <- PRESS.mat[i, j] / length(bike$bike_count)
+    RMSE.mat[i, j] <- sqrt(MSE.mat[i, j])
+  }
+}
+
+```
+
+### Cross Validation Results
+```{r}
+# Print ten-fold cross-validation estimators of PRESS, MSE, and RMSE to the screen.
+cv.results <- cbind(MODEL = formulae, PRESS=apply(PRESS.mat, MARGIN = 2, FUN = mean), 
+                    MSE=apply(MSE.mat, MARGIN = 2, FUN = mean), RMSE=apply(RMSE.mat, MARGIN = 2, FUN = mean))
+cv.results
+```
+
+
+### Model fit summary for the model with lowest MSE
+```{r}
+bike.cv.best <- lm(bike_count ~ seasons + hour + dew_point_temp + humidity + temp, data = bike)
+summary(bike.cv.best)
+
+# Calculate MSE and RMSE
+MSE <- sum((bike$bike_count - bike.cv.best$fitted.values) ^ 2) / bike.cv.best$df.residual
+RMSE <- sqrt(MSE)
+
+# Print MSE and RMSE
+c(MSE, RMSE)
+```
+
