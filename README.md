@@ -7,3 +7,32 @@ b) Which features or factors play the most crucial role in predicting bike count
 
 ## Data Set 
 https://archive.ics.uci.edu/dataset/560/seoul+bike+sharing+demand
+
+## EDA
+
+![image](https://github.com/user-attachments/assets/0d14b046-7e5d-4fc2-9ba4-152dceb01b32)
+
+![image](https://github.com/user-attachments/assets/e8dfe819-1942-4c29-b59b-2d874277e97c)
+
+![image](https://github.com/user-attachments/assets/f08cf0fa-fe13-40a6-9745-1afe8091a508)
+
+
+## Principal Component Analysis
+
+Model	
+BikeCount ~ Seasons	
+BikeCount ~ Hour	
+BikeCount _Count ~ Seasons + Hour	
+BikeCount ~ Seasons + Hour + DewPoint+ Humidity + Temp	
+BikeCount ~ DewPoint + Humidity + Temp
+BikeCount ~ Dew_Point + Humidity
+BikeCount ~ DewPoint + Temp	
+BikeCount ~ Humidity + Temp	
+BikeCount ~ DewPoint	
+BikeCount ~ Humidity	
+BikeCount ~ Temp	
+
+![image](https://github.com/user-attachments/assets/a4ad36bc-487f-4779-9c04-98b7d076f70b)
+
+![image](https://github.com/user-attachments/assets/ed0dc1c4-38b2-4efa-b244-d8a42172c4b8)
+
