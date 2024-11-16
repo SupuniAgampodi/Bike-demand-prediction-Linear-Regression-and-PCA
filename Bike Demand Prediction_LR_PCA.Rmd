@@ -1,5 +1,5 @@
 ---
-  title: "ICT513_Project_AGAMPODI"
+  title: "Bike Demand Prediction"
 author: "Supuni Agampodi"
 date: "2023-11-03"
 output: pdf_document
@@ -38,7 +38,7 @@ library(gridExtra)
 ## Read Data
 ```{r}
 # Set the working directory to the specified location
-setwd("D:/Supuni/Murdoch/Y2S2/ICT513-DA/Project")
+setwd("set_the_path")
 
 # Read the dataset 'SeoulBikeData.csv' into a variable called 'bike'
 bike <- read.csv("SeoulBikeData.csv", check.names = FALSE)
@@ -67,8 +67,6 @@ bike$functioning_day <- factor(bike$functioning_day)
 # Summarize the 'functioning_day' variable
 summary(bike$functioning_day)
 ```
-
-
 
 
 ## Visualizations
@@ -193,7 +191,6 @@ ggplot(bike, aes(x = hour, y = bike_count, color = seasons)) +
 # Method
 
 ## Part A
-
 
 ### Regression model with hour and seasons
 
@@ -382,8 +379,6 @@ percentage_contributions <- round((abs(loadings_PC1) / sum_all_loadings) * 100, 
 # Display the percentage contributions
 percentage_contributions
 ```
-
-
 
 
 ### Cross Validation 
