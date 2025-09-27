@@ -1,4 +1,4 @@
-# Analysis of Soeul Bike Sharing Demand
+# Analysis of Seoul Bike Sharing Demand
 
 ## 1.	Introduction
 
