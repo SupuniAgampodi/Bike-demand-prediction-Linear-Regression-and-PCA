@@ -8,10 +8,11 @@ This analysis of Bike Sharing Demand aims to answer two key questions:
 a) Is there an association between the season and the hour of the day with the count of rented bikes?
 b) Which features or factors play the most crucial role in predicting bike counts accurately?
 
-## Data Set 
+Data Set 
 https://archive.ics.uci.edu/dataset/560/seoul+bike+sharing+demand
 
 2.	Methods and Analysis
+   
 2.1.	Notation and Subsetting
 
 Throughout this document, variable names in the dataset will be written in italics and abbreviated where appropriate, for example, Rented Bike Count will be referred to as BikeCount, Wind Speed as Wind and Dew Point Temperature as DewPoint.
@@ -19,9 +20,13 @@ The summary statistics for the variable FunctioningDay reveal that there are 295
 Analysis was done with the R programming language with Rstudio and packages such as MASS, ggplot2, dplyr, purrr, devtools, plyr, scales and bootstrap were used where required.
 
 2.2.	Overview of the Data
+
 Notably, the bike count data is right-skewed, indicating that there are more hours with lower demand for bike rentals than hours with higher demand. 
+
 In Figure 2, the Hourly Bike Count Bar Plot, we can discern significant patterns in the demand for bike rentals over the course of a day. Notably, the hours between 1 am and 6 am consistently exhibit a low mean demand, with fewer than 500 bike counts, suggesting minimal bike rental activity during these early morning hours. In contrast, there are prominent spikes in demand at 8 am and 6 pm, corresponding to the morning and evening rush hours when people commute to and from work. This indicates a higher demand for bikes during these periods, underscoring their use for daily work commutes. Furthermore, there is a gradual increase in demand throughout the daytime hours, reaching its peak at 6 pm, mirroring work schedules. After 6 pm, demand diminishes, reaching its lowest point at 4 am, as individuals return home and activity decreases. These observations lead to the categorization of morning hours as low-demand periods and afternoon/evening hours as high-demand times, which holds significant implications for optimizing bike availability and distribution strategies.
+
 ![image](https://github.com/user-attachments/assets/0d14b046-7e5d-4fc2-9ba4-152dceb01b32)
+
 Fig 2. Hourly Bike Count Plot
 
 
